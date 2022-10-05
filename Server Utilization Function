@@ -1,0 +1,12 @@
+import gc, psutil
+
+def serverUtilization():
+    gc.collect()
+    
+    print('CPU: %'+str(psutil.cpu_percent())+'\n')
+    
+    print('Memory Total: '+'{:.2f}'.format(round(psutil.virtual_memory().total / (1024 ** 3),2))+'GB') 
+    print('Memory Used: '+'{:.2f}'.format(round(psutil.virtual_memory().used / (1024 ** 3),2))+'GB') 
+    print('Memory Utilization: %'+str(psutil.virtual_memory().percent)+'\n')
+
+serverUtilization()
