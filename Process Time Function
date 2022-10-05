@@ -1,0 +1,8 @@
+from datetime import time, datetime, timedelta
+
+def str_datetime():
+  return datetime.now().strftime('%d/%m/%Y %H:%M:%S') 
+
+def process_time(start,end):
+  x = (datetime.strptime(end,'%d/%m/%Y %H:%M:%S')) - (datetime.strptime(start,'%d/%m/%Y %H:%M:%S')).total_seconds()
+  return 'Process Time: '+str(round((time/60,2)))+' min'
