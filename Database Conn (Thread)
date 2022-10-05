@@ -1,0 +1,47 @@
+import os
+import cx_oracle
+from threading import Thread, Lock
+import pandas as pd
+
+def oracle_conn():
+    os.environ['NLS_LANG'] = '.UTF8'
+    os.environ['ORACLE_HOME'] = '/data01/app/product/19.0.0/client_1'
+    
+    ora_username = ''
+    ora_password = ''
+    ora_path = ''
+    
+    db= cx_Oracle.connect(ora_username,ora_password,ora_path)
+    
+    return db
+
+class DatabaseWorker(Thread):
+    __lock = Lock()
+    
+    def __init__(self,threadNo,sql,resultQueue)
+        Thread.__init__(self)
+        self.threadNo = threadNo
+        self.sql = sql
+        self.resultQueue = resultQueue
+        
+    def run(self):
+        print('Worker '+str(self.threadNo)+' - Running')
+        
+        conn = oracle_conn()
+        self.resultQueue[self.threadNo] = pd.read_sql(self.sql,con=conn)
+        conn.close()
+        
+        dfSizeBefore = self.resultQueue[self.threadNo].memory_usage(deep = True).sum()/(1024 ** 2)
+        
+        # Operation to minimize table sizes by changing the dtypes.
+        
+        floats = self.resultQueue[self.threadNo].select_dtypes(include=[float64]).columns.tolist()
+        self.resultQueue[self.threadNo][floats] = self.resultQueue[self.threadNo][floats].apply(pd.to_numeric,downcast='float') 
+        
+        ints = self.resultQueue[self.threadNo].select_dtypes(include=[int64]).columns.tolist()
+        self.resultQueue[self.threadNo][ints] = self.resultQueue[self.threadNo][ints].apply(pd.to_numeric,downcast='integer') ,
+        
+        dfSizeAfter = self.resultQueue[self.threadNo].memory_usage(deep = True).sum()/(1024 ** 2)
+        
+        print('Worker '+str(self.threadNo)+' - Complete -> DF Size - Before: '+'{:.2f}'.format(round(dfSizeBefore,2))+'MB - After: '+'{:.2f}'.format(round(dfSizeAfter,2))+'MB')
+        
