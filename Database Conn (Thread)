@@ -2,6 +2,7 @@ import os
 import cx_oracle
 from threading import Thread, Lock
 import pandas as pd
+import 
 
 def oracle_conn():
     os.environ['NLS_LANG'] = '.UTF8'
@@ -45,3 +46,23 @@ class DatabaseWorker(Thread):
         
         print('Worker '+str(self.threadNo)+' - Complete -> DF Size - Before: '+'{:.2f}'.format(round(dfSizeBefore,2))+'MB - After: '+'{:.2f}'.format(round(dfSizeAfter,2))+'MB')
         
+
+
+#Runtime
+
+sql_0 = ''
+sql_1 = ''
+
+resultQueue = [None] * 2
+
+workers = [DatabaseWorker(0,sql_0,resultQueue),
+            DatabaseWorker(1,sql_1,resultQueue)]
+            
+for worker in workers:
+    worker.start()
+    sleep(1)
+ 
+for worker in workers:
+    worker.join()
+
+del workers
