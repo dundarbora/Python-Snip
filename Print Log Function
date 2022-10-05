@@ -1,0 +1,15 @@
+from datetime import datetime, date, time
+import os
+
+def print2log(message):
+    print(message)
+    logFile = 'Console_Log_'+date.today().strftime('%Y-%m-%d')+'.txt'
+    with open(logFile,'a') as of:
+        of.write(message+'\n')
+
+logFile = 'Console_Log_'+date.today().strftime('%Y-%m-%d')+'.txt'
+        
+if os.path.exists(logFile):
+        os.remove(logFile)
+
+print2log('Console Run Start @ '+datetime.now().strftime('%d-%m-%Y %H:%M:%S'))
